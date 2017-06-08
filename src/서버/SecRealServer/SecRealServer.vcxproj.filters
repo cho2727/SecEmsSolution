@@ -33,6 +33,9 @@
     <ClInclude Include="SecServerSock.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="SecDataProc.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +48,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="SecServerSock.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SecDataProc.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

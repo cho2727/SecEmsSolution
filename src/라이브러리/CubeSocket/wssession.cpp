@@ -5,7 +5,7 @@
 //#include "common/wscommtypes.h"
 #include <time.h>
 
-wssession::wssession(void) : m_bConnected(false)
+wssession::wssession(void)// : m_bConnected(false)
 {
 }
 
@@ -18,13 +18,12 @@ wssession::~wssession(void)
 
 int		wssession::sock_Init(char* lpszHostAddress, UINT nHostPort, DWORD dwTimeout)
 {
-	if(IsConnected())
+	if(IsCreated())
 		return 0;
 
 	try
 	{
 		Create();		// 家南 积己
-
 		Connect(lpszHostAddress, nHostPort, dwTimeout);
 	}
 	catch(std::exception& ex)
@@ -32,14 +31,14 @@ int		wssession::sock_Init(char* lpszHostAddress, UINT nHostPort, DWORD dwTimeout
 		return -1;
 	}
 
-	m_bConnected = true;
+	//m_bConnected = true;
 	return  0;
 }
 
 void	wssession::sock_Uninit()
 {
 	Close();
-	m_bConnected = false;
+	//m_bConnected = false;
 }
 
 int		wssession::sock_SendMsg(const void* pBuffer, int nBufLen, DWORD dwTimeout)

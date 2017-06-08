@@ -28,14 +28,19 @@ public:
 
 	void*					get_buffer  ( ) const ;
 	void					set_buffer  ( const void* pBuf, unsigned int nSize );
-	void					set_swell_buffer  ( const void* pBuf, unsigned int nSize );
+	void					set_swell_buffer ( const void* pBuf, unsigned int nSize );
 	size_t					buffer_size ( );
 
-	void SetProcInfo(unsigned short usNodeCode, unsigned short usCopyNo, char* szProcName);
+	void SetSrcProcInfo(unsigned short usNodeCode, unsigned short usCopyNo, char* szProcName);
+	void SetDestProcInfo(unsigned short usNodeCode, unsigned short usCopyNo, char* szProcName);
 
-	unsigned short			NodeCode(){ return usNodeCode_; }
-	unsigned short			CopyNumber(){ return usCopyNo_; }
-	const char*		ProcName(){ return szProcName_; }
+	unsigned short			SrcNodeCode(){ return usSrcNodeCode_; }
+	unsigned short			SrcCopyNumber(){ return usSrcCopyNo_; }
+	const char*				SrcProcName(){ return szSrcProcName_; }
+
+	unsigned short			DestNodeCode(){ return usDestNodeCode_; }
+	unsigned short			DestCopyNumber(){ return usDestCopyNo_; }
+	const char*				DestProcName(){ return szDestProcName_; }
 
 private:
 	int						allocate_size( size_t nSize );
@@ -44,8 +49,12 @@ private:
 	void*				buffer_	; //!<	실제 데이터를 저장하는 버퍼
 	unsigned int		bufsize_; //!<  bufsize
 
-	unsigned short	usNodeCode_;
-	unsigned short	usCopyNo_;
-	char	szProcName_[16];
+	unsigned short		usSrcNodeCode_;
+	unsigned short		usSrcCopyNo_;
+	char				szSrcProcName_[16];
+
+	unsigned short		usDestNodeCode_;
+	unsigned short		usDestCopyNo_;
+	char				szDestProcName_[16];
 };
 

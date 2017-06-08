@@ -121,7 +121,8 @@ int SecDataParser::MakeSecDataList(CubeData::CubeDataVec& pWemsDataList
 	{
 		memset(&stSndData, 0x00, WEMSTCP_PACKET_SZ);
 		CubeData* pCubeData = new CubeData();
-		pCubeData->SetProcInfo(usDestNodeCode, usDestCopyNo, szDestProcName);
+		pCubeData->SetSrcProcInfo(usSrcNodeCode, usSrcCopyNo, szSrcProcName);
+		pCubeData->SetDestProcInfo(usDestNodeCode, usDestCopyNo, szDestProcName);
 
 		/* 전송해야될 남은 data size */
 		if(pDataOffset != NULL && iDataSize > 0)		// iDataSize = 166 
@@ -134,7 +135,8 @@ int SecDataParser::MakeSecDataList(CubeData::CubeDataVec& pWemsDataList
 		iLength = (iLength > WEMSTCP_DATA_SZ)? WEMSTCP_DATA_SZ:iLength ; //< 현재 IDX에서 보낼 데이터 사이즈
 
 		MakePacketHeader((wemsPacketHeader_st*)ptr
-			, usSrcNodeCode, usSrcCopyNo, szSrcProcName, usDestNodeCode, usDestCopyNo, szDestProcName
+			, usSrcNodeCode, usSrcCopyNo, szSrcProcName
+			, usDestNodeCode, usDestCopyNo, szDestProcName
 			, usTotalPktCnt
 			, usPktIdx
 			, WEMSTCP_HEADER_SZ + iLength);

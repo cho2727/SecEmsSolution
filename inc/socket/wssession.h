@@ -35,8 +35,8 @@ public:
 	
 	~wssession(void);
 
-	bool	IsConnected(){return m_bConnected;}
-	void	sock_SetConnct(bool val = true) {m_bConnected = val;}
+// 	bool	IsConnected(){return m_bConnected;}
+// 	void	sock_SetConnct(bool val = true) {m_bConnected = val;}
 	int		sock_Init(char* lpszHostAddress, UINT nHostPort, DWORD dwTimeout);
 	void	sock_Uninit();
 
@@ -68,7 +68,7 @@ private:
 protected:
 	CAutoEvent m_WSABlockEvent;
 
-private:
-	bool        m_bConnected;
+// private:
+// 	bool        m_bConnected;
 };
 

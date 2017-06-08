@@ -1,5 +1,6 @@
 #pragma once
 #include "sec/SecClientSock.h"
+#include "SecServerSock.h"
 #define SECSERVER			SecServer::GetInstance()
 
 
@@ -24,8 +25,14 @@ public:
 	void			SetOwnProc(ushort usNodeCode, ushort usCopyNo, char* szProcName);
 	wemsGPN_st*		GetOwnProc() {return &ownProc_; }
 
+	void AddClient(SecClientSock* client);
+	SecClientSock*	GetClient(ushort usNodeCode, ushort usCopyNo, const char* szProcName);
+	void DelClient();
+	void CheckClient();
+
 private:
 	HANDLE			service_handle_;
+	SecServerSock	server_sock_;
 	ClientList		client_list_;
 	wemsGPN_st		ownProc_;			//< 자신의 프로세스 이름
 };

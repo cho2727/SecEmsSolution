@@ -147,12 +147,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\inc\sec\SecErrorCode.h" />
+    <ClInclude Include="SecDataProc.h" />
     <ClInclude Include="SecServer.h" />
     <ClInclude Include="SecServerSock.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SecDataProc.cpp" />
     <ClCompile Include="SecRealServer.cpp" />
     <ClCompile Include="SecServer.cpp" />
     <ClCompile Include="SecServerSock.cpp" />

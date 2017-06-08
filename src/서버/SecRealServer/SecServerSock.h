@@ -16,17 +16,13 @@ public:
 	void	Abort();
 
 	virtual int Run();
-
-
-
 	//////////////////////////////////////////////
 	bool NotifyAccept(void);
 
 private:
-	CManualEvent			m_shutdownEvent;
-
-	wssocket				m_listenerSocket; //< 리슨 소켓
-	int						m_nPolicyPort;		//< 서버 포트
+	CManualEvent			shutdown_event_;
+	wssocket				listen_socket_; //< 리슨 소켓
+	int						server_port_;		//< 서버 포트
 
 };
 

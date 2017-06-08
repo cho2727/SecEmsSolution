@@ -4,15 +4,17 @@
 
 
 CubeData::CubeData(void)
-	:buffer_(NULL), bufsize_(0)
+	:buffer_(NULL), bufsize_(0), usSrcNodeCode_(0), usSrcCopyNo_(0), usDestNodeCode_(0), usDestCopyNo_(0)
 {
+	memset(szDestProcName_, 0x00, sizeof(szDestProcName_));
 }
 
 
 CubeData::CubeData(int buf_size)
-	: buffer_(NULL), bufsize_(buf_size)
+	: buffer_(NULL), bufsize_(buf_size), usSrcNodeCode_(0), usSrcCopyNo_(0), usDestNodeCode_(0), usDestCopyNo_(0)
 {
 	allocate_size(buf_size);
+	memset(szSrcProcName_, 0x00, sizeof(szSrcProcName_));
 }
 
 
@@ -78,9 +80,16 @@ int		CubeData::allocate_size( size_t nSize )
 }
 
 
-void CubeData::SetProcInfo(unsigned short usNodeCode, unsigned short usCopyNo, char* szProcName)
+void CubeData::SetSrcProcInfo(unsigned short usNodeCode, unsigned short usCopyNo, char* szProcName)
 {
-	this->usNodeCode_ = usNodeCode;
-	this->usCopyNo_ = usCopyNo;
-	strcpy(this->szProcName_, szProcName);
+	this->usSrcNodeCode_ = usNodeCode;
+	this->usSrcCopyNo_ = usCopyNo;
+	strcpy(this->szSrcProcName_, szProcName);
+}
+
+void CubeData::SetDestProcInfo(unsigned short usNodeCode, unsigned short usCopyNo, char* szProcName)
+{
+	this->usDestNodeCode_ = usNodeCode;
+	this->usDestCopyNo_ = usCopyNo;
+	strcpy(this->szDestProcName_, szProcName);
 }

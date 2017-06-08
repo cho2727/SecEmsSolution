@@ -12,7 +12,9 @@
 #endif
 #endif
 
-typedef int (__stdcall *PacketDataProcPtr)(wemsGPN_st* stGpnProc, wemsDataPacket_st* pRcvData);
+//typedef int (__stdcall *PacketDataProcPtr)(wemsGPN_st* stGpnProc, wemsDataPacket_st* pRcvData);
+typedef int (__stdcall *PacketDataProcPtr)(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, wemsDataPacket_st* pRcvData);
+
 
 class WELLS_Export SecClientSock : public CubeBoxThread, public wssession
 {
@@ -56,6 +58,10 @@ public:
 
 	int	SendMsgData(ushort usDestNodeCode, ushort usDestCopyNo, char* szDestProcName, ushort nReqMsg, ushort nResmsg
 		, int nCnt, char* pData, int iDataSize);
+
+	int	SendMsgData(ushort usSrcNodeCode, ushort usSrcCopyNo, char* szSrcProcName
+		, ushort usDestNodeCode, ushort usDestCopyNo, char* szDestProcName
+		, ushort nReqMsg, ushort nResmsg, int nCnt, char* pData, int iDataSize);
 
 	CubeBoxThread* GetDataProcThread(){ return sock_worker_; }
 

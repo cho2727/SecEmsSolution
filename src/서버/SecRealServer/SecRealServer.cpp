@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 	SetUnhandledExceptionFilter(UnhandledExceptionHandler); // 예외발생 이벤트 핸들러 등록
 	if(argc < 3)
 	{
-		WLOG("[main] proc not start(param cnt:%d)\n", argc);
+		WLOG("[main] proc not start(param cnt:%d, ex:proc.exe 0 config.xml)\n", argc);
 		return -1;
 	}	
 
@@ -73,6 +73,6 @@ int main(int argc, char* argv[])
 		SECSERVER->ServiceRun();
 
 	SECSERVER->ServiceDestroy();
-	WLOG("==================================\n");
+	WLOG("[SVR] %s Program Stop\n", OWNPROCNAME);
 	return 0;
 }

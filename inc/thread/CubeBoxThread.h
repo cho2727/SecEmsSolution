@@ -11,7 +11,6 @@
 #endif
 #endif
 
-
 class WELLS_Export CubeBoxThread : public CubeThread
 {
 public:

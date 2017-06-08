@@ -16,7 +16,7 @@
 #include <iostream>
 #include <list>
 
-
+#include "sec/SecSocketInit.h"
 #include "log/CubeLog.h"
 #include "sec/SecErrorCode.h"
 #include "sec/SecCommTypes.h"

@@ -4,6 +4,15 @@
 //#include "wemsclientsock.h"
 #include "SecServer.h"
 #include "Sec/SecClientSock.h"
+#include "SecDataProc.h"
+
+
+int __stdcall PacketDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, wemsDataPacket_st* pRcvData)
+{
+	SecDataProc::GetInstance()->PacketDataProc(stSrcProc, stDestProc, pRcvData);
+	return 0;
+}
+
 
 #define m_dwThreadWait			5
 SecServerSock::SecServerSock(void)
@@ -25,14 +34,14 @@ int		SecServerSock::Init()
 
 void SecServerSock::Activate()
 {
-	m_shutdownEvent.Reset();
+	shutdown_event_.Reset();
 	
 	Start();
 }
 
 void SecServerSock::Abort()
 {
-	m_shutdownEvent.Set();
+	shutdown_event_.Set();
 	Wait();
 }
 
@@ -49,15 +58,16 @@ int SecServerSock::Run()
 
 	try
 	{
+		nPort = 39701;
 		memset(strAddr, 0x00, 128);
 
-		m_listenerSocket.Create();
+		listen_socket_.Create();
 		// 소켓 레벨 (SOL_SOCKET:소켓 레벨에서의 처리, IPPROTO_TCP:프로토콜 레벨에서의 처리)
-		m_listenerSocket.SetSockOpt(SO_REUSEADDR, (char*)&nOptValue, sizeof(nOptValue), SOL_SOCKET); //< 소켓 옵션 지정
+		listen_socket_.SetSockOpt(SO_REUSEADDR, (char*)&nOptValue, sizeof(nOptValue), SOL_SOCKET); //< 소켓 옵션 지정
 		sockEvent = WSACreateEvent(); //< 이벤트 객체를 만듭니다.
 		if(sockEvent != WSA_INVALID_EVENT)
 		{//정상
-			nRet = WSAEventSelect(SOCKET(m_listenerSocket), sockEvent, FD_ACCEPT); //< 이벤트 객체를 통해 네트워크 이벤트를 감지합니다.
+			nRet = WSAEventSelect(SOCKET(listen_socket_), sockEvent, FD_ACCEPT); //< 이벤트 객체를 통해 네트워크 이벤트를 감지합니다.
 			if(nRet != SOCKET_ERROR)
 			{
 // 				wemsNodeName_st	OwnNodeName = WS_SERVICE->GetOwnProc()->stNodeName;
@@ -66,9 +76,9 @@ int SecServerSock::Run()
 // 				if(OwnNodeInfo == NULL)
 // 					return -1;
 
-				m_listenerSocket.Bind(39701); // 임시로 포트 지정(추후 인자값으로 받아야함)
-				m_listenerSocket.Listen();
-				m_listenerSocket.GetSockName(strAddr, nPort);
+				listen_socket_.Bind(39701); // 임시로 포트 지정(추후 인자값으로 받아야함)
+				listen_socket_.Listen();
+				listen_socket_.GetSockName(strAddr, nPort);
 
 				WLOG("server socket listen(%s:%d) suc\n", strAddr, nPort);
 				// WEMS_SHM->shm_SetProcConn(WS_SERVICE->GetOwnProc()->stProcName.iCopy, WS_SERVICE->GetOwnProc()->stProcName.szProcName, TRUE);
@@ -77,7 +87,7 @@ int SecServerSock::Run()
 
 		while(true)
 		{
-			dwRet = ::WaitForSingleObject( m_shutdownEvent.GetEvent(), m_dwThreadWait );
+			dwRet = ::WaitForSingleObject( shutdown_event_.GetEvent(), m_dwThreadWait );
 			if( dwRet  == WAIT_OBJECT_0 ) //이벤트 발생시
 			{
 				WLOG("server listen socket thread exit(event)\n");
@@ -89,7 +99,7 @@ int SecServerSock::Run()
 			if(dwRet == WSA_WAIT_TIMEOUT)
 				continue;
 
-			nRet = WSAEnumNetworkEvents(SOCKET(m_listenerSocket), sockEvent, &events); //< 구체적인 네트워크 이벤트를 알아냅니다.
+			nRet = WSAEnumNetworkEvents(SOCKET(listen_socket_), sockEvent, &events); //< 구체적인 네트워크 이벤트를 알아냅니다.
 			if(nRet == SOCKET_ERROR)
 			{
 				WLOG("listen socket evt chk err (code:%ld)\n", WSAGetLastError());
@@ -133,19 +143,19 @@ bool SecServerSock::NotifyAccept(void)
 
 	try
 	{
-		m_listenerSocket.Accept(clientSock, clientAddr); //< 실패시 예외 발생
+		listen_socket_.Accept(clientSock, clientAddr); //< 실패시 예외 발생
 		WLOG("socket notifyaccect succ (cli_sock:%d)\n", clientSock);
 		// ACCEPT 성공
 
  		wemsGPN_st* ownProc = SECSERVER->GetOwnProc();
 		SecClientSock* client = new SecClientSock(clientSock, *(ushort*)&ownProc->stNodeName, ownProc->stProcName.iCopy, ownProc->stProcName.szProcName);
-
+		client->ClientInit(PacketDataProc);
 // 		wemsclientsock* client = new wemsclientsock(clientSock, *(ushort*)&OwnProc->stNodeName, OwnProc->stProcName.iCopy, OwnProc->stProcName.szProcName); // 서버측에 생성되는 ....
 
-//		client->Activate();
+		client->Activate();
 
 		// 클라이언트 감시 추가
-		//WS_SERVICE->AddClient(client);
+		SECSERVER->AddClient(client);
 	}
 	catch(CWSocketException& ex)
 	{
