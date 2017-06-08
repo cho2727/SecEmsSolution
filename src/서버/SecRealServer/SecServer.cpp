@@ -60,4 +60,5 @@ void SecServer::SetOwnProc(ushort usNodeCode, ushort usCopyNo, char* szProcName)
 	this->ownProc_.stNodeName = *(wemsNodeName_st*)&usNodeCode;
 	this->ownProc_.stProcName.iCopy = usCopyNo;
 	strcpy(this->ownProc_.stProcName.szProcName, szProcName);
+	WLOG("1111");
 }
