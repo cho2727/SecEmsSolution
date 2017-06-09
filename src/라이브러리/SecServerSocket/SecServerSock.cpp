@@ -33,6 +33,12 @@ SecServerSock::~SecServerSock(void)
 {
 }
 
+int		SecServerSock::Init(int nPort, ServerAccept pFunc)
+{
+	server_port_ = nPort;
+	serverAccept_ = pFunc;
+	return 0;
+}
 
 void SecServerSock::Activate()
 {
@@ -147,17 +153,6 @@ bool SecServerSock::NotifyAccept(void)
 		{
 			serverAccept_(clientSock);
 		}
-#if 0
-		wemsGPN_st* ownProc = SECSERVER->GetOwnProc();
-		SecClientSock* client = new SecClientSock(clientSock, *(ushort*)&ownProc->stNodeName, ownProc->stProcName.iCopy, ownProc->stProcName.szProcName);
-		client->ClientInit(PacketDataProc);
-		// 		wemsclientsock* client = new wemsclientsock(clientSock, *(ushort*)&OwnProc->stNodeName, OwnProc->stProcName.iCopy, OwnProc->stProcName.szProcName); // 서버측에 생성되는 ....
-
-		client->Activate();
-
-		// 클라이언트 감시 추가
-		SECSERVER->AddClient(client);
-#endif
 	}
 	catch(CWSocketException& ex)
 	{

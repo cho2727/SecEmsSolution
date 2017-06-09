@@ -56,7 +56,7 @@ int			SecServer::ServiceRun()
 				iRet = real_sock_->ClientInit(*(ushort*)&this->ownProc_.stNodeName
 					, this->ownProc_.stProcName.iCopy
 					, this->ownProc_.stProcName.szProcName
-					, "122.129.249.142", 39701, 1000, PacketDataProc);
+					, "122.129.249.142", 39702, 1000, PacketDataProc);
 
 				if(iRet != 0)
 				{
@@ -70,7 +70,7 @@ int			SecServer::ServiceRun()
 				}
 				else
 				{
-					iRet = real_sock_->SendMsgData(*(ushort*)&this->ownProc_.stNodeName, SEC_ONLY_COPYNUM, "SecRealServer", FC_PROC_REG_REQS, FC_PROC_REG_REQS, 0, NULL, 0);
+					iRet = real_sock_->SendMsgData(*(ushort*)&this->ownProc_.stNodeName, SEC_ONLY_COPYNUM, "SecConServer", FC_PROC_REG_REQS, FC_PROC_REG_REQS, 0, NULL, 0);
 					if(iRet == 0)
 					{
 						WLOG("[SVR] Connect Succ\n");
@@ -116,5 +116,5 @@ void SecServer::SetOwnProc(ushort usNodeCode, ushort usCopyNo, char* szProcName)
 {
 	this->ownProc_.stNodeName = *(wemsNodeName_st*)&usNodeCode;
 	this->ownProc_.stProcName.iCopy = usCopyNo;
-	strcpy(this->ownProc_.stProcName.szProcName, szProcName);
+	strcpy_s(this->ownProc_.stProcName.szProcName, szProcName);
 }

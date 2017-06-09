@@ -84,12 +84,12 @@ void CubeData::SetSrcProcInfo(unsigned short usNodeCode, unsigned short usCopyNo
 {
 	this->usSrcNodeCode_ = usNodeCode;
 	this->usSrcCopyNo_ = usCopyNo;
-	strcpy(this->szSrcProcName_, szProcName);
+	strcpy_s(this->szSrcProcName_, szProcName);
 }
 
 void CubeData::SetDestProcInfo(unsigned short usNodeCode, unsigned short usCopyNo, char* szProcName)
 {
 	this->usDestNodeCode_ = usNodeCode;
 	this->usDestCopyNo_ = usCopyNo;
-	strcpy(this->szDestProcName_, szProcName);
+	strcpy_s(this->szDestProcName_, szProcName);
 }

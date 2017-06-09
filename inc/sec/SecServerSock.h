@@ -21,7 +21,7 @@ public:
 	SecServerSock(int nPort, ServerAccept pFunc);
 	~SecServerSock(void);
 
-
+	int		Init(int nPort, ServerAccept pFunc);
 	void	Activate();
 	void	Abort();
 

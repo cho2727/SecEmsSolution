@@ -1,9 +1,9 @@
 #pragma once
 #include "sec/SecClientSock.h"
-#include "SecServerSock.h"
+#include "sec/SecServerSock.h"
 #define SECSERVER			SecServer::GetInstance()
 
-
+class SecServerSock;
 class SecServer
 {
 public:

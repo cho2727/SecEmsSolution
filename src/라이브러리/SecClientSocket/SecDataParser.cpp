@@ -29,8 +29,8 @@ int MakePacketHeader(wemsPacketHeader_st *SendHeader,
 	SendHeader->SrcProc.usCopyNo	= usSrcCopyNo;
 	SendHeader->DestProc.usNodeCode	= usDestNodeCode;
 	SendHeader->DestProc.usCopyNo	= usDestCopyNo;
-	strcpy(SendHeader->SrcProc.szProcName, szSrcProcName);
-	strcpy(SendHeader->DestProc.szProcName, szDestProcName);
+	strcpy_s(SendHeader->SrcProc.szProcName, szSrcProcName);
+	strcpy_s(SendHeader->DestProc.szProcName, szDestProcName);
 	SendHeader->usTotPktCnt = tot_packet_cnt;
 	SendHeader->usPktIdx = packet_idx;
 	SendHeader->usPktLength = length;

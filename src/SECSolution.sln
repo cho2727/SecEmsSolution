@@ -121,7 +121,8 @@ Global
 		{47DB0714-FC04-4119-B0CD-369A1599FF8E}.Debug|x64.ActiveCfg = Debug|Win32
 		{47DB0714-FC04-4119-B0CD-369A1599FF8E}.Release|Win32.ActiveCfg = Release|Win32
 		{47DB0714-FC04-4119-B0CD-369A1599FF8E}.Release|Win32.Build.0 = Release|Win32
-		{47DB0714-FC04-4119-B0CD-369A1599FF8E}.Release|x64.ActiveCfg = Release|Win32
+		{47DB0714-FC04-4119-B0CD-369A1599FF8E}.Release|x64.ActiveCfg = Release|x64
+		{47DB0714-FC04-4119-B0CD-369A1599FF8E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
