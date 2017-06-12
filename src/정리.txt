@@ -1,0 +1,9 @@
+실시간 서비스 : FEP(다중처리), HMI(다중처리)
+
+제어 서비스 : 2개의 쓰레드
+
+메시지 서비스 : 2개의 쓰레드
+
+데이터 처리 쓰레드
+
+WELLS_DLL_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;WSCLIENTSOCKET_EXPORTS;%(PreprocessorDefinitions)
