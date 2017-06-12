@@ -1,5 +1,6 @@
 #pragma once
 #include "sec/SecClientSock.h"
+#include "sec/SecMultiSock.h"
 
 #define SECSERVER			SecServer::GetInstance()
 
@@ -27,6 +28,6 @@ private:
 	HANDLE				service_handle_;
 	wemsGPN_st			ownProc_;			//< 자신의 프로세스 이름
 
-	SecClientSock*		real_sock_;
+	SecMultiSock		multi_sock_;
 };
 

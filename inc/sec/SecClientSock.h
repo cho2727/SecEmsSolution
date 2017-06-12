@@ -27,6 +27,7 @@ public:
 	void Activate();
 	void Abort();
 
+
 	virtual int Run();
 
 	//----------------------------
@@ -49,7 +50,7 @@ public:
 	//int ClientInit(char* proc_name, int copy_no, int timeoutsec);
 	int ClientInit(ushort usNodeName, ushort usCopyNo, char* szProcName, char* lpszHostAddress, UINT nHostPort, int timeoutsec, PacketDataProcPtr pFunc); //< 자신의 프로세스 정보를 ...
 	int ClientInit(ushort usNodeName, ushort usCopyNo, char* szProcName, char* lpszHostAddress, UINT nHostPort, int timeoutsec, CubeBoxThread* worker, PacketDataProcPtr pFunc); //< 클라이언트이고 자신의 worker 생성된 쓰레드를 사용
-	int ClientInit(CubeBoxThread* worker, PacketDataProcPtr pFunc); // 서버 모드이고 자신의 worker 생성된 쓰레드를 사용
+	int ClientInit(CubeBoxThread* worker); // 서버 모드이고 자신의 worker 생성된 쓰레드를 사용
 	int ClientInit(PacketDataProcPtr pFunc); // 서버 모드이고 SecSockWorker 쓰레드 사용
 
 	void SetDestProc(ushort usNodeCode, ushort usCopyNo, char* szProcName);
@@ -62,6 +63,8 @@ public:
 	int	SendMsgData(ushort usSrcNodeCode, ushort usSrcCopyNo, char* szSrcProcName
 		, ushort usDestNodeCode, ushort usDestCopyNo, char* szDestProcName
 		, ushort nReqMsg, ushort nResmsg, int nCnt, char* pData, int iDataSize);
+
+	bool		IsConnected() { return IsCreated(); }
 
 	CubeBoxThread* GetDataProcThread(){ return sock_worker_; }
 

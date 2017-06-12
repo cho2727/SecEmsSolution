@@ -146,12 +146,14 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SecConfig.h" />
     <ClInclude Include="SecDataProc.h" />
     <ClInclude Include="SecServer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SecConfig.cpp" />
     <ClCompile Include="SecDataProc.cpp" />
     <ClCompile Include="SecScheduler.cpp" />
     <ClCompile Include="SecServer.cpp" />

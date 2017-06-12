@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="SecClientSock.cpp" />
     <ClCompile Include="SecDataParser.cpp" />
+    <ClCompile Include="SecMultiSock.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

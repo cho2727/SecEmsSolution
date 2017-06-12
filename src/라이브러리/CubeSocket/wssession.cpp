@@ -2,6 +2,7 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include "socket/wssession.h"
+#include "sec/SecErrorCode.h"
 //#include "common/wscommtypes.h"
 #include <time.h>
 
@@ -19,20 +20,24 @@ wssession::~wssession(void)
 int		wssession::sock_Init(char* lpszHostAddress, UINT nHostPort, DWORD dwTimeout)
 {
 	if(IsCreated())
-		return 0;
+		return SEC_OK;
 
 	try
 	{
 		Create();		// 家南 积己
 		Connect(lpszHostAddress, nHostPort, dwTimeout);
 	}
+	catch(CWSocketException& ex)
+	{
+		return ex.GetErrorCode();
+	}
 	catch(std::exception& ex)
 	{
-		return -1;
+		return SEC_SOCK_EXCEPTION;
 	}
 
 	//m_bConnected = true;
-	return  0;
+	return  SEC_OK;
 }
 
 void	wssession::sock_Uninit()

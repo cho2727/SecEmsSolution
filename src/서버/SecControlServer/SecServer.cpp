@@ -3,6 +3,7 @@
 #include "SecDataProc.h"
 
 
+
 int __stdcall ClientDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, wemsDataPacket_st* pRcvData)
 {
 	SecDataProc::GetInstance()->PacketDataProc(stSrcProc, stDestProc, pRcvData);
@@ -13,16 +14,17 @@ int __stdcall SocketAcceptProc(SOCKET client_socket)
 {
 	wemsGPN_st* ownProc = SECSERVER->GetOwnProc();
 	SecClientSock* client = new SecClientSock(client_socket, *(ushort*)&ownProc->stNodeName, ownProc->stProcName.iCopy, ownProc->stProcName.szProcName);
-	client->ClientInit(ClientDataProc);
+	//client->ClientInit(ClientDataProc);
+	client->ClientInit(SECSERVER->GetControlWorker());
 	client->Activate();
 
 	// 클라이언트 감시 추가
 	SECSERVER->AddClient(client);
-	return 0;
+	return SEC_OK;
 }
 
 SecServer::SecServer(void)
-	: server_sock_()
+	: server_sock_(), control_worker_()
 {
 	service_handle_  = ::CreateEvent( 0, TRUE, FALSE, 0 );
 	memset(&ownProc_, 0x00, sizeof(wemsGPN_st));
@@ -43,9 +45,9 @@ SecServer*	SecServer::GetInstance( void )
 int			SecServer::ServiceInit(int nCopyNo, char* szConfigFile)
 {
 	int iRet = 0;
-	WLOG("[SVR] %s Program Start\n", OWNPROCNAME);
+	WLOG("%s Program Start\n", OWNPROCNAME);
 	SetOwnProc(0, nCopyNo, OWNPROCNAME);
-
+	SecConfig::GetInstance()->ConfigLoad(szConfigFile);
 	return iRet;
 }
 
@@ -53,10 +55,11 @@ int			SecServer::ServiceRun()
 {
 	int iRet = 0;
 	DWORD dwWait;
-	SocketInit sec_sock;
-	server_sock_.Init(39702, SocketAcceptProc);
 
+	server_sock_.Init(SecConfig::GetInstance()->ControlPort(), SocketAcceptProc);
 	server_sock_.Activate();
+	control_worker_.Activate();
+
 	while( (dwWait=::WaitForSingleObject(service_handle_, /*INFINITE*/MainThreadWait)) != WAIT_OBJECT_0 ) 
 	{
 		if(dwWait == WAIT_TIMEOUT)
@@ -66,6 +69,7 @@ int			SecServer::ServiceRun()
 		}
 	}
 
+	control_worker_.Abort();
 	server_sock_.Abort();
 	return iRet;
 }
@@ -146,13 +150,14 @@ void SecServer::CheckClient()
 				continue;
 
 
-			if(!(*it)->IsCreated())
+			if(!(*it)->IsConnected())
 			{
 				(*it)->Abort();
-				WLOG("proc(%s:%d) client socket close\n"
+				WLOG("proc(%s:%02d) client socket close\n"
 					, stProcName->stProcName.szProcName
 					, stProcName->stProcName.iCopy);
 
+				Sleep(20);
 				delete *it;
 
 				it = client_list_.erase(it);

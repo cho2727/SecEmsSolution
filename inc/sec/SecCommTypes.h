@@ -28,22 +28,23 @@
 #endif
 
 // RETURN CODE
-#define	WEMS_OK					0
-#define	WEMS_ERR				-1
-#define	WEMS_SKIP				-2
-#define	WEMS_ERR_XMIT			-3
-#define	WEMS_ERR_PROTOCOL		-4
-#define	WEMS_ERR_ACK			-5
-#define	WEMS_TIMEOUT			-6
-#define	WEMS_DB_DISCONNECTED	-7
-#define WEMS_SOCK_CLOSE			-8
-#define WEMS_SOCK_RCV_SIZE_ERR	-9
-#define WEMS_SOCK_TIMEOUT		10
-#define WEMS_NOT_OWNDATA		20
-//#define WEMS_ALREADY_INIT		30
+// #define	WEMS_OK					0
+// #define	WEMS_ERR				-1
+// #define	WEMS_SKIP				-2
+// #define	WEMS_ERR_XMIT			-3
+// #define	WEMS_ERR_PROTOCOL		-4
+// #define	WEMS_ERR_ACK			-5
+// #define	WEMS_TIMEOUT			-6
+// #define	WEMS_DB_DISCONNECTED	-7
+// #define WEMS_SOCK_CLOSE			-8
+// #define WEMS_SOCK_RCV_SIZE_ERR	-9
+// #define WEMS_SOCK_TIMEOUT		10
+// #define WEMS_NOT_OWNDATA		20
+// #define WEMS_ALREADY_INIT		30
 
 
 #define		MAX_PROCNAME_SZ			16
+#define		MAX_ADDR_SZ				16
 #define		PROC_CONFIG_SZ			32
 
 
@@ -144,6 +145,10 @@ typedef struct {
  	{ WEMS_NM_ANY			,	"any"			},
  };
 
+
+ #define		SEC_REAL_PROC					"SecRealSvc"
+ #define		SEC_CON_PROC					"SecConSvc"
+ #define		SEC_MSG_PROC					"SecMsgSvc"
 
 // #define WEMS_MSGMD_PROCNM				"wemsmsgmd"
 // #define WEMS_SYSMD_PROCNM				"wemssysmd"

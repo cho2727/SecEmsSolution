@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include <winsock2.h>
+//#include <winsock2.h>
 #include <Windows.h>
 
 #include <iostream>
@@ -22,7 +22,9 @@
 #include "sec/SecCommTypes.h"
 #include "sec/SecMessageCode.h"
 
+#include "SecConfig.h"
+
 #define		MainThreadWait			100
-#define		OWNPROCNAME			"SecRealServer"
+#define		OWNPROCNAME			SEC_REAL_PROC
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.

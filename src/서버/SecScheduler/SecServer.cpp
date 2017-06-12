@@ -2,7 +2,7 @@
 #include "SecServer.h"
 #include "SecDataProc.h"
 #include "sec/SecMessageCode.h"
-
+#include "sec/SecMultiSock.h"
 
 
 int __stdcall PacketDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, wemsDataPacket_st* pRcvData)
@@ -13,7 +13,7 @@ int __stdcall PacketDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, wems
 
 
 SecServer::SecServer(void)
-	: real_sock_(NULL)
+	: multi_sock_( )
 {
 	service_handle_  = ::CreateEvent( 0, TRUE, FALSE, 0 );
 	memset(&ownProc_, 0x00, sizeof(wemsGPN_st));
@@ -34,9 +34,19 @@ SecServer*	SecServer::GetInstance( void )
 int			SecServer::ServiceInit(int nCopyNo, char* szConfigFile)
 {
 	int iRet = 0;
-	WLOG("[SVR] %s Program Start\n", OWNPROCNAME);
+	WLOG("%s Program Start\n", OWNPROCNAME);
 	SetOwnProc(0, nCopyNo, OWNPROCNAME);
 
+	SecConfig::GetInstance()->ConfigLoad(szConfigFile);
+	
+	multi_sock_.Init(*(ushort*)&this->ownProc_.stNodeName
+		, this->ownProc_.stProcName.iCopy
+		, this->ownProc_.stProcName.szProcName
+		, SecConfig::GetInstance()->ServerAddr()
+		, SecConfig::GetInstance()->RealPort()
+		, SecConfig::GetInstance()->ControlPort()
+		, SecConfig::GetInstance()->MessagePort()
+		, PacketDataProc);
 	return iRet;
 }
 
@@ -44,61 +54,25 @@ int			SecServer::ServiceRun()
 {
 	int iRet = 0;
 	DWORD dwWait;
-	SocketInit sec_sock;
+	int		iData = 1;
 	while( (dwWait=::WaitForSingleObject(service_handle_, /*INFINITE*/MainThreadWait)) != WAIT_OBJECT_0 ) 
 	{
 		if(dwWait == WAIT_TIMEOUT)
 		{
 			// 실제 구현부
-			if(real_sock_ == NULL)
+			multi_sock_.SockConnectCheck();		// 주기적으로 채크를 수행
+			multi_sock_.SendRealData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
+			multi_sock_.SendControlData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
+			multi_sock_.SendMessageData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
+			if(iData++ > 100000)
 			{
-				real_sock_ = new SecClientSock();
-				iRet = real_sock_->ClientInit(*(ushort*)&this->ownProc_.stNodeName
-					, this->ownProc_.stProcName.iCopy
-					, this->ownProc_.stProcName.szProcName
-					, "122.129.249.142", 39702, 1000, PacketDataProc);
-
-				if(iRet != 0)
-				{
-					if(real_sock_)
-					{
-						delete real_sock_;
-						real_sock_ = NULL;
-						WLOG("[SVR] Server not connect(ret:%d)\n", iRet);
-						continue;
-					}
-				}
-				else
-				{
-					iRet = real_sock_->SendMsgData(*(ushort*)&this->ownProc_.stNodeName, SEC_ONLY_COPYNUM, "SecConServer", FC_PROC_REG_REQS, FC_PROC_REG_REQS, 0, NULL, 0);
-					if(iRet == 0)
-					{
-						WLOG("[SVR] Connect Succ\n");
-					}
-					else
-					{
-						WLOG("[SVR] Connect Fail\n");
-					}
-					real_sock_->Activate();
-				}
-			}
-			else
-			{
-				WLOG("[SVR] Socket is connect(%d)\n", real_sock_->IsCreated());
-				if(!real_sock_->IsCreated())
-				{
-					real_sock_->Abort();
-					delete real_sock_;
-					real_sock_ = NULL;
-				}
-				else
-				{
-					iRet = real_sock_->SendMsgData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, FC_PROC_TEST_REQS, 1, (char*)&ownProc_, sizeof(ownProc_));
-				}
+				iData = 1;
 			}
 		}
 	}
 
+
+	multi_sock_.Uninit();
 	return iRet;
 }
 void		SecServer::ServiceDestroy()

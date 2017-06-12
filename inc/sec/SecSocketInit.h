@@ -1,5 +1,5 @@
 #pragma once
-
+#include <stdio.h>
 class SocketInit
 {
 public:
@@ -14,5 +14,36 @@ public:
 	virtual ~SocketInit()
 	{
 		WSACleanup();
+		printf("WSACleanup\n");
+	}
+};
+
+
+
+class CCoInitialize
+{
+public:
+	CCoInitialize(void)
+	{
+		//ASSERT(SUCCEEDED(CoInitializeEx(NULL, COINIT_MULTITHREADED)));
+		HRESULT result = CoInitialize( NULL );
+	}
+	~CCoInitialize(void)
+	{
+		CoUninitialize();
+		printf("CoUninitialize\n");
+	}
+};
+
+class CCoInitializeEx
+{
+public:
+	CCoInitializeEx(void)
+	{
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	}
+	~CCoInitializeEx(void)
+	{
+		CoUninitialize();
 	}
 };

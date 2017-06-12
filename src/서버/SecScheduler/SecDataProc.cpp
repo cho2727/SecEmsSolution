@@ -25,9 +25,9 @@ int SecDataProc::PacketDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, w
 	{
 	case FC_PROC_TEST_REQS:
 		{
-			WLOG("[SVR] FC_PROC_TEST_REQS Receive\n");
-			wemsGPN_st* pData = (wemsGPN_st*)&pRcvData->pData;
-			WLOG("DATA------------------%s:%02d\n", pData->stProcName.szProcName, pData->stProcName.iCopy);
+			int* pData = (int*)&pRcvData->pData;
+			for(int i=0; i<pRcvData->stDataHeader.usCount; i++)
+				WLOG("PROC(%s:%d) RCV DATA(%d) RCV\n", stSrcProc->stProcName.szProcName, stSrcProc->stProcName.iCopy, *pData);
 		}
 		break;
 

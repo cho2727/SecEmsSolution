@@ -6,17 +6,16 @@
 
 #ifdef _DEBUG
 #pragma comment(lib, "CubeLogd.lib")
-#pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "CubeThreadd.lib")
-#pragma comment(lib, "CubeSocketd.lib")
 #pragma comment(lib, "SecClientSocketd.lib")
-
+#pragma comment(lib, "SecServerSocketd.lib")
+#pragma comment(lib, "SecBaseConfigd.lib")
 #else
 #pragma comment(lib, "CubeLog.lib")
-#pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "CubeThread.lib")
-#pragma comment(lib, "CubeSocket.lib")
 #pragma comment(lib, "SecClientSocket.lib")
+#pragma comment(lib, "SecServerSocket.lib")
+#pragma comment(lib, "SecBaseConfig.lib")
 #endif
 
 
@@ -73,6 +72,6 @@ int main(int argc, char* argv[])
 		SECSERVER->ServiceRun();
 
 	SECSERVER->ServiceDestroy();
-	WLOG("[SVR] %s Program Stop\n", OWNPROCNAME);
+	WLOG("%s Program Stop\n", OWNPROCNAME);
 	return 0;
 }

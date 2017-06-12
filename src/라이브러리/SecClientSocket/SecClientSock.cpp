@@ -3,7 +3,9 @@
 #include "log/CubeLog.h"
 #include "sec/SecCommTypes.h"
 #include "sec/SecMessageCode.h"
+#include "sec/SecErrorCode.h"
 #include "SecDataParser.h"
+#include "sec/SecErrorCode.h"
 
 
 #ifdef _DEBUG
@@ -65,6 +67,7 @@ int SecClientSock::ClientInit(ushort usNodeName, ushort usCopyNo, char* szProcNa
 	{
 		WLOG("Excption : %0x\n", ex);
 	}
+
 	return nRet;
 }
 
@@ -85,6 +88,7 @@ int SecClientSock::ClientInit(ushort usNodeName, ushort usCopyNo, char* szProcNa
 			clientType_ = WORKER_OTHER;
 		}
 	}
+
 	catch(std::exception& ex)
 	{
 		WLOG("Excption : %0x\n", ex);
@@ -92,14 +96,14 @@ int SecClientSock::ClientInit(ushort usNodeName, ushort usCopyNo, char* szProcNa
 	return nRet;
 }
 
-int SecClientSock::ClientInit(CubeBoxThread* worker, PacketDataProcPtr pFunc)
+int SecClientSock::ClientInit(CubeBoxThread* worker)
 {
 	int nRet = -1;
 	try
 	{
 		sock_receiver_ = new SecSockReceiver(*this);
 		sock_worker_ = worker;
-		PacketDataProcFunc_ = pFunc;
+		//PacketDataProcFunc_ = pFunc;
 		clientType_ = WORKER_OTHER;
 	}
 	catch(std::exception& ex)
@@ -198,10 +202,6 @@ int SecClientSock::Run()
 	wemsPacket_st*		SndPacketData;
 	wemsDataPacket_st*	SndData;
 
-//	char			szSrcNodeName[WEMS_MAX_NODE_NAME_STR_SZ];
-//	char			szDestNodeName[WEMS_MAX_NODE_NAME_STR_SZ];
-	//char			szDateTime[64] ={0,};
-
 	int					iMsgCode = 0;
 	int					iSentSize = 0;
 	int					iSendSize = 0;
@@ -229,15 +229,14 @@ int SecClientSock::Run()
 				}
 				catch(CWSocketException& ex)
 				{
-					WLOG("snd data error(err:%d)\n", ex.GetErrorCode());
-					WLOG("src(%s:%02d) --> dest(%s:%02d) size(%d) idx(%d/%d) data snd fail(socket close)\n"
+					WLOG("src(%s:%02d) --> dest(%s:%02d) size(%d) idx(%d/%d) data snd fail(socket close:err:%d)\n"
 						, SndPacketData->stPacketHeader.SrcProc.szProcName
 						, SndPacketData->stPacketHeader.SrcProc.usCopyNo
 						, SndPacketData->stPacketHeader.DestProc.szProcName
 						, SndPacketData->stPacketHeader.DestProc.usCopyNo
 						, SndPacketData->stPacketHeader.usPktLength
 						, SndPacketData->stPacketHeader.usPktIdx
-						, SndPacketData->stPacketHeader.usTotPktCnt);
+						, SndPacketData->stPacketHeader.usTotPktCnt, ex.GetErrorCode());
 					break; // 여기를 어떻게 처리해야 하나요????
 				}
 
@@ -250,6 +249,7 @@ int SecClientSock::Run()
 				if(iSentSize == iSendSize)
 				{
 					// 메시지 전송 성공(TCP)
+#if 0
  					WLOG("src(%s:%02d) --> dest(%s:%02d) code(0x%0x) size(%d) idx(%d/%d) data snd suc\n"
  						, SndPacketData->stPacketHeader.SrcProc.szProcName
  						, SndPacketData->stPacketHeader.SrcProc.usCopyNo
@@ -259,6 +259,7 @@ int SecClientSock::Run()
  						, SndPacketData->stPacketHeader.usPktLength
  						, SndPacketData->stPacketHeader.usPktIdx
  						, SndPacketData->stPacketHeader.usTotPktCnt);
+#endif
 // 
 				}
 				else
@@ -291,12 +292,12 @@ int SecClientSock::Run()
 		Close();
 	}
 
-//	char			szNodeName[WEMS_MAX_NODE_NAME_STR_SZ];
-	WLOG("proc(%s:%d) snd thread run exit\n"
+	WLOG("Src(%s:%02d) Dest(%s:%02d) send thread run exit\n"
 		, stSrcProc_.stProcName.szProcName
-		, stSrcProc_.stProcName.iCopy);
+		, stSrcProc_.stProcName.iCopy
+		, stDestProc_.stProcName.szProcName
+		, stDestProc_.stProcName.iCopy);
 
-//	sock_SetConnct(false);
 	return 0;
 }
 
@@ -307,11 +308,9 @@ int		SecClientSock::SendMsgData(ushort usDestNodeCode, ushort usDestCopyNo, char
 	, int nCnt, char* pData, int iDataSize)
 {
 	int nRet = 0;
-//	char			szSrcNodeName[WEMS_MAX_NODE_NAME_STR_SZ];
-//	char			szDestNodeName[WEMS_MAX_NODE_NAME_STR_SZ];
 
 	if(!IsCreated())
-		return WEMS_SOCK_CLOSE;
+		return SEC_SOCK_CLOSE;
  
  	CubeData::CubeDataVec vData;
  	wemsGPN_st	*stProcName = GetSrcProc();
@@ -342,7 +341,7 @@ int	SecClientSock::SendMsgData(ushort usSrcNodeCode, ushort usSrcCopyNo, char* s
 	int nRet = 0;
 
 	if(!IsCreated())
-		return WEMS_SOCK_CLOSE;
+		return SEC_SOCK_CLOSE;
 
 	CubeData::CubeDataVec vData;
 
@@ -380,7 +379,6 @@ int SecClientSock::SecSockReceiver::Run()
 {
 	DWORD				dwRet = 0x00;
 	wemsPacket_st		RcvPacketData;
-	//wemsDataPacket_st*	RcvData;
 	int					nRet = 0;
 
  	while(true)
@@ -400,32 +398,40 @@ int SecClientSock::SecSockReceiver::Run()
  		if(client_sock_.SocketType() == SOCKET_CLIENT) // 클라이언트 소켓이면
  		{
  			nRet = ClientRecvPacket(&RcvPacketData);
- 			if(nRet == WEMS_OK)
+ 			if(nRet == SEC_OK)
  			{
  				RcvPacketProc(&RcvPacketData);
  			}
- 			else if(nRet < WEMS_OK)
+ 			else if(nRet < SEC_OK)
  			{
+				if(nRet == SEC_SOCK_TIMEOUT)
+					continue;
+
  				client_sock_.Close(); // 소켓 종료
  			}
  		}
  		else if(client_sock_.SocketType() == SOCKET_SERVER)
  		{
  			nRet = ClientRecvPacket(&RcvPacketData);
- 			if(nRet == 0)
+ 			if(nRet == SEC_OK)
  			{
  				RcvPacketProc(&RcvPacketData);
  			}
- 			else if(nRet < WEMS_OK)
+ 			else if(nRet < SEC_OK)
  			{
+				if(nRet == SEC_SOCK_TIMEOUT)
+					continue;
+
  				client_sock_.Close(); // 소켓 종료
  			}
  		}
  	}
 
- 	WLOG("proc(%s:%d) rcv thread run exit\n"
- 		, client_sock_.GetSrcProc()->stProcName.szProcName
- 		, client_sock_.GetSrcProc()->stProcName.iCopy);
+	WLOG("Src(%s:%02d) Dest(%s:%02d) recv thread run exit\n"
+		, client_sock_.GetSrcProc()->stProcName.szProcName
+		, client_sock_.GetSrcProc()->stProcName.iCopy
+		, client_sock_.GetDestProc()->stProcName.szProcName
+		, client_sock_.GetDestProc()->stProcName.iCopy);
 
 	return 0;
 }
@@ -437,71 +443,28 @@ int SecClientSock::SecSockReceiver::RcvPacketProc(wemsPacket_st *pRcvPacket )
 	wemsGPN_st	*stProcName = client_sock_.GetSrcProc();
 	char			szNodeName[WEMS_MAX_NODE_NAME_STR_SZ] = {0,};
 
-// 	if(*(ushort*)&stProcName->stNodeName == pRcvPacket->stPacketHeader.DestProc.usNodeCode &&
-// 		stProcName->stProcName.iCopy == pRcvPacket->stPacketHeader.DestProc.usCopyNo &&
-// 		strcmp(stProcName->stProcName.szProcName, pRcvPacket->stPacketHeader.DestProc.szProcName) == 0) // 자신의 것이면
-// 	if(NODENAME_EQUAL((wemsNodeName_st*)&stProcName->stNodeName, (wemsNodeName_st*)&pRcvPacket->stPacketHeader.DestProc.usNodeCode) && 
-// 		stProcName->stProcName.iCopy == pRcvPacket->stPacketHeader.DestProc.usCopyNo &&
-// 		strcmp(stProcName->stProcName.szProcName, pRcvPacket->stPacketHeader.DestProc.szProcName) == 0)
-// 	{
-// 
-// 	}
-
-
-// 	if(*(ushort*)&stProcName->stNodeName == pRcvPacket->stPacketHeader.DestProc.usNodeCode &&
-// 		stProcName->stProcName.iCopy == pRcvPacket->stPacketHeader.DestProc.usCopyNo &&
-// 		strcmp(stProcName->stProcName.szProcName, pRcvPacket->stPacketHeader.DestProc.szProcName) == 0) // 자신의 것이면
-	if(NODENAME_EQUAL((wemsNodeName_st*)&stProcName->stNodeName, (wemsNodeName_st*)&pRcvPacket->stPacketHeader.DestProc.usNodeCode) && 
-		stProcName->stProcName.iCopy == pRcvPacket->stPacketHeader.DestProc.usCopyNo &&
-		strcmp(stProcName->stProcName.szProcName, pRcvPacket->stPacketHeader.DestProc.szProcName) == 0)
+	if(RcvData->stDataHeader.usRequestFc == FC_PROC_REG_REQS)
 	{
-		if(RcvData->stDataHeader.usRequestFc == FC_PROC_REG_REQS)
+		WLOG("proc(%s:%02d) register\n"
+			, pRcvPacket->stPacketHeader.SrcProc.szProcName
+			, pRcvPacket->stPacketHeader.SrcProc.usCopyNo);
+
+		BOOL isConnect = TRUE;
+		if(isConnect)
 		{
-			// 1. 송신한 클라이언트가 즉 SRC가 자신의 노드 또는 BACKUP이면 허용
-			// 2. 
-			WLOG("proc(%s:%02d) register\n"
-				, pRcvPacket->stPacketHeader.SrcProc.szProcName
-				, pRcvPacket->stPacketHeader.SrcProc.usCopyNo);
-
-			BOOL isConnect = TRUE;
-			if(isConnect)
-			{
-				client_sock_.SetDestProc(pRcvPacket->stPacketHeader.SrcProc.usNodeCode, 
-					pRcvPacket->stPacketHeader.SrcProc.usCopyNo, 
-					pRcvPacket->stPacketHeader.SrcProc.szProcName);
-			}
-			else
-			{
-				client_sock_.Close(); // 소켓 종료
-			}
-
-			free(pRcvPacket->pData); 
+			client_sock_.SetDestProc(pRcvPacket->stPacketHeader.SrcProc.usNodeCode, 
+				pRcvPacket->stPacketHeader.SrcProc.usCopyNo, 
+				pRcvPacket->stPacketHeader.SrcProc.szProcName);
 		}
 		else
 		{
-			// 처리 쓰레드에 전송
-			//SecClientSock::SecSockWorker* pThread = client_sock_.GetDataProcThread();
-			CubeBoxThread* workThread = client_sock_.GetDataProcThread();
-			if(workThread != NULL)
-			{
-				// 처리쓰레드에서 메모리 해제
-				CubeData* pData = new CubeData();
-				pData->SetSrcProcInfo(pRcvPacket->stPacketHeader.SrcProc.usNodeCode, pRcvPacket->stPacketHeader.SrcProc.usCopyNo, pRcvPacket->stPacketHeader.SrcProc.szProcName);
-				pData->SetDestProcInfo(pRcvPacket->stPacketHeader.DestProc.usNodeCode, pRcvPacket->stPacketHeader.DestProc.usCopyNo, pRcvPacket->stPacketHeader.DestProc.szProcName);
-				pData->set_swell_buffer(pRcvPacket->pData, pRcvPacket->stPacketHeader.usPktLength);
-				workThread->MsgSend(pData);
-			}
-			else
-			{
-				WLOG("rcv data not proc (proc_thr is null)");
-				free(pRcvPacket->pData); 
-			}
+			client_sock_.Close(); // 소켓 종료
 		}
+
+		free(pRcvPacket->pData); 
 	}
-	else // 자신의 노드가 아니면
+	else
 	{
-		// 처리 안함(버림) -- 나오면 안됨.
-		//WLOG("rcv data not proc (own proc <> dest proc)\n");
 		// 처리 쓰레드에 전송
 		//SecClientSock::SecSockWorker* pThread = client_sock_.GetDataProcThread();
 		CubeBoxThread* workThread = client_sock_.GetDataProcThread();
@@ -535,14 +498,11 @@ int SecClientSock::SecSockReceiver::ClientRecvPacket( wemsPacket_st *pRcvPacket 
 	ushort		usPacketIndex;
 	ushort		usPacketDataSize = 0;
 
-//	char			szSrcNodeName[WEMS_MAX_NODE_NAME_STR_SZ];
-//	char			szDestNodeName[WEMS_MAX_NODE_NAME_STR_SZ];
-
 	int					iMsgCode = 0;
 	try
 	{
 		if(!client_sock_.IsCreated())		// 소켓이 ...
-			return WEMS_SOCK_CLOSE;
+			return SEC_SOCK_CLOSE;
 
 		int nReceivedSize = 0;
 		nReceivedSize = client_sock_.sock_RecvMsg((char*)&pRcvPacket->stPacketHeader, WEMSTCP_HEADER_SZ, WEMSTCP_RCV_TIMEOUT); // 최초 수신시 헤더파일을 읽는다.
@@ -566,7 +526,7 @@ int SecClientSock::SecSockReceiver::ClientRecvPacket( wemsPacket_st *pRcvPacket 
 					{
 						// 문제있음.
 						WLOG("rcv socket recevied size error");
-						return WEMS_SOCK_RCV_SIZE_ERR;
+						return SEC_SOCK_RCV_SIZE_ERR;
 					}
 
 					usPacketIndex = pRcvPacket->stPacketHeader.usPktIdx;
@@ -579,6 +539,7 @@ int SecClientSock::SecSockReceiver::ClientRecvPacket( wemsPacket_st *pRcvPacket 
 					RcvData = (wemsDataPacket_st*) pRcvPacket->pData;
 					iMsgCode = RcvData->stDataHeader.usRequestFc;
 
+#if 0
  					WLOG("src(%s:%02d) --> dest(%s:%02d) code(0x%0x) size(%d) idx(%d/%d) data rcv suc\n"
  						, pRcvPacket->stPacketHeader.SrcProc.szProcName
  						, pRcvPacket->stPacketHeader.SrcProc.usCopyNo
@@ -588,12 +549,13 @@ int SecClientSock::SecSockReceiver::ClientRecvPacket( wemsPacket_st *pRcvPacket 
  						, pRcvPacket->stPacketHeader.usPktLength
  						, pRcvPacket->stPacketHeader.usPktIdx
  						, pRcvPacket->stPacketHeader.usTotPktCnt);
+#endif
 				}
 				else
 				{
 					// 문제있음.
 					WLOG("socket recevied size error");
-					return WEMS_SOCK_RCV_SIZE_ERR;
+					return SEC_SOCK_RCV_SIZE_ERR;
 				}
 				usPacketIndex++;
 			} while (pRcvPacket->stPacketHeader.usPktIdx < usPacketCount);
@@ -604,7 +566,7 @@ int SecClientSock::SecSockReceiver::ClientRecvPacket( wemsPacket_st *pRcvPacket 
 		{
 			// 문제있음.
 			WLOG("socket recevied size error");
-			return WEMS_SOCK_RCV_SIZE_ERR;
+			return SEC_SOCK_RCV_SIZE_ERR;
 		}
 	}
 	catch(CWSocketException& ex)
@@ -616,11 +578,11 @@ int SecClientSock::SecSockReceiver::ClientRecvPacket( wemsPacket_st *pRcvPacket 
 				, client_sock_.GetSrcProc()->stProcName.szProcName
 				, client_sock_.GetSrcProc()->stProcName.iCopy
 				, ex.GetErrorCode());
-			nRet = WEMS_SOCK_CLOSE; // 소켓 클로즈 에러
+			nRet = SEC_SOCK_CLOSE; // 소켓 클로즈 에러
 		}
 		else
 		{
-			nRet = WEMS_SOCK_TIMEOUT; // 소켓 타임아웃 에러 (정상)
+			nRet = SEC_SOCK_TIMEOUT; // 소켓 타임아웃 에러 (정상)
 		}
 	}
 
@@ -677,7 +639,7 @@ int SecClientSock::SecSockWorker::Run()
 				if(client_sock_.PacketDataProcFunc_ != NULL)
 				{
 					int iRet = client_sock_.PacketDataProcFunc_(&GpnSrcProc, &GpnDestProc, pDataPacket);
-					if(iRet == WEMS_OK)
+					if(iRet == SEC_OK)
 					{
 
 					}
@@ -704,9 +666,11 @@ int SecClientSock::SecSockWorker::Run()
 		}
 	}
 
-	WLOG("proc(%s:%d) proc thread run exit\n"
+	WLOG("Src(%s:%02d) Dest(%s:%02d) proc thread run exit\n"
 		, client_sock_.GetSrcProc()->stProcName.szProcName
-		, client_sock_.GetSrcProc()->stProcName.iCopy);
+		, client_sock_.GetSrcProc()->stProcName.iCopy
+		, client_sock_.GetDestProc()->stProcName.szProcName
+		, client_sock_.GetDestProc()->stProcName.iCopy);
 
 	return 0;
 }
