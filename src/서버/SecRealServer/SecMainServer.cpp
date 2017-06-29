@@ -1,22 +1,27 @@
-// SecScheduler.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
+// SecRealServer.cpp : 콘솔 응용 프로그램에 대한 진입점을 정의합니다.
 //
 
 #include "stdafx.h"
 #include "SecServer.h"
 
-
-
 #ifdef _DEBUG
 #pragma comment(lib, "CubeLogd.lib")
 #pragma comment(lib, "CubeThreadd.lib")
 #pragma comment(lib, "SecClientSocketd.lib")
+#pragma comment(lib, "SecServerSocketd.lib")
 #pragma comment(lib, "SecBaseConfigd.lib")
+#pragma comment(lib, "SecShardMemoryd.lib")
+#pragma comment(lib, "CubeOleDbd.lib")
 #else
 #pragma comment(lib, "CubeLog.lib")
 #pragma comment(lib, "CubeThread.lib")
 #pragma comment(lib, "SecClientSocket.lib")
+#pragma comment(lib, "SecServerSocket.lib")
 #pragma comment(lib, "SecBaseConfig.lib")
+#pragma comment(lib, "SecShardMemory.lib")
+#pragma comment(lib, "CubeOleDb.lib")
 #endif
+
 
 LONG CALLBACK UnhandledExceptionHandler(EXCEPTION_POINTERS *lpExceptionInfo)  
 {  
@@ -42,6 +47,7 @@ static BOOL WINAPI console_ctrl_handler(DWORD dwCtrlType)
 		SECSERVER->SetEvent(); // 메인 쓰레드에게 프로그램 정상종료하게끔 함.
 		break;
 	case CTRL_BREAK_EVENT: // Ctrl+Break
+		SECSERVER->SetEvent(); // 메인 쓰레드에게 프로그램 정상종료하게끔 함.
 		break;
 	case CTRL_CLOSE_EVENT: // Closing the console window
 		break;

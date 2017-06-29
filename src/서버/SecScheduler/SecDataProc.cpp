@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "SecDataProc.h"
+#include "sec/SecMultiSock.h"
+#include "secserver.h"
 
 
 SecDataProc::SecDataProc(void)
@@ -21,6 +23,7 @@ SecDataProc* SecDataProc::GetInstance( void )
 
 int SecDataProc::PacketDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, wemsDataPacket_st* pRcvData)
 {	
+	int iRet = 0;
 	switch(pRcvData->stDataHeader.usRequestFc)
 	{
 	case FC_PROC_TEST_REQS:
@@ -28,6 +31,13 @@ int SecDataProc::PacketDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, w
 			int* pData = (int*)&pRcvData->pData;
 			for(int i=0; i<pRcvData->stDataHeader.usCount; i++)
 				WLOG("PROC(%s:%d) RCV DATA(%d) RCV\n", stSrcProc->stProcName.szProcName, stSrcProc->stProcName.iCopy, *pData);
+
+			SecMultiSock* multi_sock =  SECSERVER->GetMultiSock();
+
+			iRet = multi_sock->SendMessageData(*(ushort*)&stSrcProc->stNodeName, stSrcProc->stProcName.iCopy, stSrcProc->stProcName.szProcName
+				, pRcvData->stDataHeader.usRequestFc, pRcvData->stDataHeader.usCount, (char*)&pRcvData->pData, sizeof(int));
+
+			Sleep(500);
 		}
 		break;
 
@@ -48,5 +58,5 @@ int SecDataProc::PacketDataProc(wemsGPN_st* stSrcProc, wemsGPN_st* stDestProc, w
 		break;
 	}
 
-	return 0;
+	return iRet;
 }

@@ -3,7 +3,7 @@
 #include "sec/SecErrorCode.h"
 #include "common/CubeBaseString.h"
 
-#import<msxml4.dll>
+#import<msxml6.dll>
 
 #pragma comment(lib, "ws2_32.lib")
 #ifdef _DEBUG
@@ -60,7 +60,7 @@ int					SecBaseConfig::ConfigLoad()
 
 	MSXML2::IXMLDOMDocument2Ptr	xmlPars;
 	char		szModulePath[MAX_PATH] = {0,};
-	char		szFileName[MAX_PATH] = {0,};
+	char		szFullFileName[MAX_PATH] = {0,};
 
 	HRESULT hr = xmlPars.CreateInstance(__uuidof(DOMDocument));
 	if(FAILED(hr))
@@ -69,10 +69,10 @@ int					SecBaseConfig::ConfigLoad()
 	}
 
 	CubeBase::GetModulePath(szModulePath);
-	sprintf(szFileName, "%sconfig\\sec_server.xml", szModulePath);
+	sprintf(szFullFileName, "%sconfig\\sec_server.xml", szModulePath);
 
-	hr = xmlPars->load(szFileName);
-	if(hr == 0)
+	hr = xmlPars->load(szFullFileName);
+	if(hr == VARIANT_FALSE)
 	{
 		return SEC_CONFIG_LOAD_FAIL;
 	}
@@ -83,43 +83,40 @@ int					SecBaseConfig::ConfigLoad()
 
 	try
 	{
-		MSXML2::IXMLDOMNodeListPtr pNodeList = pDocNode->selectNodes("//sec_server/server");
-
-		if(pNodeList == NULL)
-			return SEC_CONFIG_SEL_FAIL;
-
-		if(pNodeList != NULL)
+		// MSXML2::IXMLDOMNodeListPtr pNodeList = pDocNode->selectNodes("//sec_server/server");
+		MSXML2::IXMLDOMElementPtr pFindNode = pDocNode->selectSingleNode("//sec_server/server");
+		if(pFindNode != NULL)
 		{
-			for(int i=0; i<pNodeList->length; i++)
-			{
-				MSXML2::IXMLDOMElementPtr pFindNode = pNodeList->Getitem(i);
-				_variant_t varValue;
+			_variant_t varValue;
 
-				varValue = pFindNode->getAttribute("code");
-				if (varValue.vt != VT_NULL)
-					strcpy_s(server_code_, varValue.operator _bstr_t());
-				varValue.Clear();
+			varValue = pFindNode->getAttribute("code");
+			if (varValue.vt != VT_NULL)
+				strcpy_s(server_code_, varValue.operator _bstr_t());
+			varValue.Clear();
 
-				varValue = pFindNode->getAttribute("addr");
-				if (varValue.vt != VT_NULL)
-					strcpy_s(server_addr_, varValue.operator _bstr_t());
-				varValue.Clear();
+			varValue = pFindNode->getAttribute("addr");
+			if (varValue.vt != VT_NULL)
+				strcpy_s(server_addr_, varValue.operator _bstr_t());
+			varValue.Clear();
 
-				varValue = pFindNode->getAttribute("real_port");
-				if (varValue.vt != VT_NULL)
-					real_port_ = atoi(varValue.operator _bstr_t());
-				varValue.Clear();
+			varValue = pFindNode->getAttribute("real_port");
+			if (varValue.vt != VT_NULL)
+				real_port_ = atoi(varValue.operator _bstr_t());
+			varValue.Clear();
 
-				varValue = pFindNode->getAttribute("control_port");
-				if (varValue.vt != VT_NULL)
-					control_port_ = atoi(varValue.operator _bstr_t());
-				varValue.Clear();
+			varValue = pFindNode->getAttribute("control_port");
+			if (varValue.vt != VT_NULL)
+				control_port_ = atoi(varValue.operator _bstr_t());
+			varValue.Clear();
 
-				varValue = pFindNode->getAttribute("event_port");
-				if (varValue.vt != VT_NULL)
-					message_port_ = atoi(varValue.operator _bstr_t());
-				varValue.Clear();
-			}
+			varValue = pFindNode->getAttribute("event_port");
+			if (varValue.vt != VT_NULL)
+				message_port_ = atoi(varValue.operator _bstr_t());
+			varValue.Clear();
+		}
+		else
+		{
+			return SEC_CONFIG_NOT_DATA;
 		}
 	}
 	catch (...)
@@ -127,12 +124,11 @@ int					SecBaseConfig::ConfigLoad()
 		return SEC_CONFIG_EXCEPTION;
 	}
 
-	
-
-	return 0;
+	return SEC_OK;
 }
 
 int					SecBaseConfig::ConfigLoad(char* szFileName)
 {
+
 	return 0;
 }

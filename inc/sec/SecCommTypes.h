@@ -146,9 +146,11 @@ typedef struct {
  };
 
 
- #define		SEC_REAL_PROC					"SecRealSvc"
- #define		SEC_CON_PROC					"SecConSvc"
- #define		SEC_MSG_PROC					"SecMsgSvc"
+#define		SEC_REAL_PROC					"SecRealSvc"
+#define		SEC_CON_PROC					"SecConSvc"
+#define		SEC_MSG_PROC					"SecMsgSvc"
+
+#define		SEC_MANAGER_HANDLE				_T("manager_event_handle")
 
 // #define WEMS_MSGMD_PROCNM				"wemsmsgmd"
 // #define WEMS_SYSMD_PROCNM				"wemssysmd"
@@ -489,6 +491,15 @@ typedef	wmsg_update_pdb_st	wmsg_req_sync_pdb_st;
 #define	DEF_BITMAP_COMMON_14			0x4000		//
 #define	DEF_BITMAP_COMMON_15			0x8000		//
 
+typedef enum _PointType_e
+{
+	PT_NONE,
+	PT_BI,
+	PT_BO,
+	PT_AI,
+	PT_AO,
+	PT_CNT
+}PointType_e;
 
 #if 0
 typedef struct

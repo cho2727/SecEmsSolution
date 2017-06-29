@@ -65,18 +65,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\..\bin\x86</OutDir>
+    <TargetName>SecConSvc</TargetName>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\..\bin\x64</OutDir>
+    <TargetName>SecConSvc</TargetName>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\..\bin\x86</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <TargetName>SecConSvc</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\..\bin\x64</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>SecConSvc</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -155,7 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SecConfig.cpp" />
-    <ClCompile Include="SecControlServer.cpp" />
+    <ClCompile Include="SecMainServer.cpp" />
     <ClCompile Include="SecControlWorker.cpp" />
     <ClCompile Include="SecDataProc.cpp" />
     <ClCompile Include="SecServer.cpp" />

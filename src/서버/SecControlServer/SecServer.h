@@ -22,15 +22,15 @@ public:
 	int ServiceRun();
 	void ServiceDestroy();
 
-	void SetEvent();
+	void			SetEvent();
 	void			SetOwnProc(ushort usNodeCode, ushort usCopyNo, char* szProcName);
 	wemsGPN_st*		GetOwnProc() {return &ownProc_; }
 	CubeBoxThread*	GetControlWorker() { return &control_worker_; }
 
-	void AddClient(SecClientSock* client);
+	void			AddClient(SecClientSock* client);
 	SecClientSock*	GetClient(ushort usNodeCode, ushort usCopyNo, const char* szProcName);
-	void DelClient();
-	void CheckClient();
+	void			DelClient();
+	void			CheckClient();
 
 private:
 	HANDLE				service_handle_;

@@ -41,9 +41,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="SecControlServer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="SecDataProc.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -54,6 +51,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="SecConfig.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SecMainServer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

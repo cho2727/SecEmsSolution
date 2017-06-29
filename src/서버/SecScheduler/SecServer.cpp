@@ -55,19 +55,22 @@ int			SecServer::ServiceRun()
 	int iRet = 0;
 	DWORD dwWait;
 	int		iData = 1;
+
+	multi_sock_.SendMessageData(*(ushort*)&this->ownProc_.stNodeName, 0, "SecHistorical", FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
+
 	while( (dwWait=::WaitForSingleObject(service_handle_, /*INFINITE*/MainThreadWait)) != WAIT_OBJECT_0 ) 
 	{
 		if(dwWait == WAIT_TIMEOUT)
 		{
 			// 실제 구현부
 			multi_sock_.SockConnectCheck();		// 주기적으로 채크를 수행
-			multi_sock_.SendRealData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
-			multi_sock_.SendControlData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
-			multi_sock_.SendMessageData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
-			if(iData++ > 100000)
-			{
-				iData = 1;
-			}
+			//multi_sock_.SendRealData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
+			//multi_sock_.SendControlData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
+			//multi_sock_.SendMessageData(*(ushort*)&this->ownProc_.stNodeName, this->ownProc_.stProcName.iCopy, this->ownProc_.stProcName.szProcName, FC_PROC_TEST_REQS, 1, (char*)&(iData), sizeof(int));
+// 			if(iData++ > 100000)
+// 			{
+// 				iData = 1;
+// 			}
 		}
 	}
 

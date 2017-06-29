@@ -23,6 +23,7 @@ public:
 	void			SetOwnProc(ushort usNodeCode, ushort usCopyNo, char* szProcName);
 	wemsGPN_st*		GetOwnProc() {return &ownProc_; }
 
+	SecMultiSock*		GetMultiSock() { return &multi_sock_; }
 
 private:
 	HANDLE				service_handle_;

@@ -12,15 +12,19 @@
 
 //#include <winsock2.h>
 #include <Windows.h>
-
+#include <map>
 #include <iostream>
 #include <list>
+#include <algorithm>
+using namespace std;
 
 #include "sec/SecSocketInit.h"
 #include "log/CubeLog.h"
 #include "sec/SecErrorCode.h"
 #include "sec/SecCommTypes.h"
 #include "sec/SecMessageCode.h"
+
+#include "shm/SecShardMem.h"
 
 #include "SecConfig.h"
 

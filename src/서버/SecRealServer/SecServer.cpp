@@ -50,6 +50,14 @@ int			SecServer::ServiceInit(int nCopyNo, char* szConfigFile)
 	WLOG("%s Program Start\n", OWNPROCNAME);
 	SetOwnProc(0, nCopyNo, OWNPROCNAME);
 	SecConfig::GetInstance()->ConfigLoad(szConfigFile);
+
+	iRet = SecShardMem::GetInstance()->SM_Init();
+	if(iRet != SEC_OK)
+	{
+		WLOG("SEC Shard Memory Init Fail(ret:%d)\n", iRet);
+		return iRet;
+	}
+
 	return iRet;
 }
 

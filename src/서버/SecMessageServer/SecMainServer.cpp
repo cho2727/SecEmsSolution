@@ -43,6 +43,7 @@ static BOOL WINAPI console_ctrl_handler(DWORD dwCtrlType)
 		SECSERVER->SetEvent(); // 메인 쓰레드에게 프로그램 정상종료하게끔 함.
 		break;
 	case CTRL_BREAK_EVENT: // Ctrl+Break
+		SECSERVER->SetEvent(); // 메인 쓰레드에게 프로그램 정상종료하게끔 함.
 		break;
 	case CTRL_CLOSE_EVENT: // Closing the console window
 		break;

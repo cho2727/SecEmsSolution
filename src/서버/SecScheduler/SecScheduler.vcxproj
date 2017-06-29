@@ -155,7 +155,7 @@
   <ItemGroup>
     <ClCompile Include="SecConfig.cpp" />
     <ClCompile Include="SecDataProc.cpp" />
-    <ClCompile Include="SecScheduler.cpp" />
+    <ClCompile Include="SecMainServer.cpp" />
     <ClCompile Include="SecServer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

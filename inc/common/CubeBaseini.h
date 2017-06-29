@@ -1,10 +1,10 @@
 #pragma once
 
-#ifndef UPC_Export
-#ifdef UPC_DLL_EXPORTS
-#define UPC_Export __declspec(dllexport)
+#ifndef STRING_Export
+#ifdef	CUBEBASESTRING_EXPORTS
+#define STRING_Export __declspec(dllexport)
 #else
-#define UPC_Export __declspec(dllimport)
+#define STRING_Export __declspec(dllimport)
 #endif
 #endif
 
@@ -84,7 +84,7 @@ typedef struct _IniTuple_s {
  */
 #define INI_MAX_KEY_NUM 250
 
-class UPC_Export CubeBaseini
+class STRING_Export CubeBaseini
 {
 public:
 	CubeBaseini(void);

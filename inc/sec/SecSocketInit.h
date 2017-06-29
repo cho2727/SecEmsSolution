@@ -14,7 +14,6 @@ public:
 	virtual ~SocketInit()
 	{
 		WSACleanup();
-		printf("WSACleanup\n");
 	}
 };
 
@@ -31,7 +30,6 @@ public:
 	~CCoInitialize(void)
 	{
 		CoUninitialize();
-		printf("CoUninitialize\n");
 	}
 };
 
